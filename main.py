@@ -14,8 +14,8 @@ logging.basicConfig(
 )
 
 # === ЗАМЕНИТЕ ЭТИ ЗНАЧЕНИЯ ===
-TOKEN = "8031227579:AAGic9Nz_Lc1YXt7oe-NjhZs5UgOCWT2Efg"  # ← Замените на свой токен!
-YOUR_CHAT_ID = 5226029430  # ← Замените на ваш ID (узнать: @userinfobot)
+TOKEN = os.environ.get('TOKEN', '8031227579:AAGic9Nz_Lc1YXt7oe-NjhZs5UgOCWT2Efg') # ← Замените на свой токен!
+YOUR_CHAT_ID = int(os.environ.get('YOUR_CHAT_ID', '5226029430')) # ← Замените на ваш ID (узнать: @userinfobot)
 
 # Контент
 утренние_намерения = [
