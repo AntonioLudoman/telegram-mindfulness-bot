@@ -1,11 +1,13 @@
 import logging
 from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes, JobQueue
+from telegram.ext import Application, CommandHandler, ContextTypes
 import random
-from datetime import time, datetime, timedelta
+from datetime import time
 import os
 import asyncio
 import pytz
+from flask import Flask
+from threading import Thread
 
 # Настройка логирования
 logging.basicConfig(
@@ -13,9 +15,14 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# === ЗАМЕНИТЕ ЭТИ ЗНАЧЕНИЯ ===
-TOKEN = os.environ.get('TOKEN', 'YOUR_BOT_TOKEN_HERE')
-YOUR_CHAT_ID = int(os.environ.get('YOUR_CHAT_ID', '1234567890'))
+# Получаем переменные окружения
+TOKEN = os.environ.get('TOKEN')
+YOUR_CHAT_ID = int(os.environ.get('YOUR_CHAT_ID'))
+
+# Проверяем наличие обязательных переменных
+if not TOKEN or not YOUR_CHAT_ID:
+    logging.error("Не установлены обязательные переменные окружения: TOKEN и YOUR_CHAT_ID")
+    exit(1)
 
 # Контент
 утренние_намерения = [
@@ -26,12 +33,10 @@ YOUR_CHAT_ID = int(os.environ.get('YOUR_CHAT_ID', '1234567890'))
 
 цитаты = [
     "Познай себя — и ты познаешь Вселенную. — Гермес",
-    "Снижай значимость — и реальность скользит. — Зеланд",
-    "Я - часть разума, создающего этот мир. - Гермес",
-    "Я снижаю значимость, не цепляюсь, доверяю потоку. - Зеланд",
+    "Снижай значимость — и реальность скользит. — Зеланд"
 ]
 
-# Обработчики
+# Обработчики команд
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🌟 Бот запущен!\n"
@@ -71,20 +76,16 @@ async def test(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Если вы видите это сообщение, значит бот работает."
     )
 
-async def manual_morning(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Ручная отправка утреннего сообщения"""
-    await send_morning(context)
-    await update.message.reply_text("Утреннее сообщение отправлено вручную")
+# Создаем Flask приложение для поддержания активности
+app = Flask(__name__)
 
-async def manual_evening(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Ручная отправка вечернего сообщения"""
-    await send_evening(context)
-    await update.message.reply_text("Вечернее сообщение отправлено вручную")
+@app.route('/')
+def home():
+    return "Бот работает!"
 
-async def check_jobs(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Проверка активных задач планировщика"""
-    job_names = [job.name for job in context.application.job_queue.jobs()]
-    await update.message.reply_text(f"Активные задачи: {', '.join(job_names) if job_names else 'Нет активных задач'}")
+@app.route('/health')
+def health():
+    return "OK", 200
 
 # Основная функция
 async def main():
@@ -94,9 +95,6 @@ async def main():
     # Добавляем обработчики команд
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("test", test))
-    application.add_handler(CommandHandler("morning", manual_morning))
-    application.add_handler(CommandHandler("evening", manual_evening))
-    application.add_handler(CommandHandler("jobs", check_jobs))
     
     # Настраиваем планировщик заданий
     job_queue = application.job_queue
@@ -106,38 +104,23 @@ async def main():
     
     # Рассылка (время в МСК)
     job_queue.run_daily(send_morning, time(8, 0, 0, tzinfo=moscow_tz))   # 8:00 по МСК
-    job_queue.run_daily(send_evening, time(23, 20, 0, tzinfo=moscow_tz))  # 23:00 по МСК
-    
-    # Альтернативный способ - отправка каждые 10 минут для тестирования
-    # job_queue.run_repeating(send_morning, interval=600, first=10)
+    job_queue.run_daily(send_evening, time(23, 0, 0, tzinfo=moscow_tz))  # 23:00 по МСК
     
     # Запускаем бота в режиме polling
     await application.initialize()
     await application.start()
     await application.updater.start_polling()
     
-    # Сохраняем ссылку на application для доступа извне
-    global app_instance
-    app_instance = application
+    logging.info("Бот запущен и работает")
     
     # Бесконечный цикл для поддержания работы бота
     while True:
         await asyncio.sleep(3600)
 
-# Создаем простой HTTP-сервер для поддержания активности
-from flask import Flask
-from threading import Thread
-
-app = Flask('')
-
-@app.route('/')
-def home():
-    return "Бот работает! Последняя активность: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
 def run_flask():
-    app.run(host='0.0.0.0', port=8080)
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port)
 
-# Запуск приложения
 if __name__ == '__main__':
     # Запускаем Flask в отдельном потоке
     flask_thread = Thread(target=run_flask)
