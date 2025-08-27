@@ -1,21 +1,40 @@
 MIT License
 
-Copyright (c) 2025 AntonioLudoman
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 4. Загрузка кода в репозиторий
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+### Вариант A: Через GitHub Desktop (рекомендуется для начинающих)
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+1. Установите [GitHub Desktop](https://desktop.github.com/)
+2. Войдите в свой аккаунт
+3. Клонируйте созданный репозиторий
+4. Скопируйте все файлы проекта в папку репозитория
+5. В GitHub Desktop:
+   - Убедитесь, что все файлы отображаются во вкладке "Changes"
+   - Напишите сообщение коммита (например, "Initial commit")
+   - Нажмите "Commit to main"
+   - Нажмите "Push origin"
+
+### Вариант B: Через командную строку
+
+1. Установите Git: [git-scm.com](https://git-scm.com/)
+2. Откройте терминал/командную строку
+3. Выполните команды:
+
+```bash
+# Клонируйте репозиторий
+git clone https://github.com/ваш-username/telegram-mindfulness-bot.git
+
+# Перейдите в папку проекта
+cd telegram-mindfulness-bot
+
+# Скопируйте все файлы проекта в эту папку
+
+# Добавьте файлы в Git
+git add .
+
+# Создайте коммит
+git commit -m "Initial commit"
+
+# Загрузите на GitHub
+git push origin main
