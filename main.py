@@ -104,7 +104,7 @@ async def main():
     
     # Рассылка (время в МСК)
     job_queue.run_daily(send_morning, time(8, 0, 0, tzinfo=moscow_tz))   # 8:00 по МСК
-    job_queue.run_daily(send_evening, time(23, 51, 0, tzinfo=moscow_tz))  # 23:00 по МСК
+    job_queue.run_daily(send_evening, time(23, 55, 0, tzinfo=moscow_tz))  # 23:00 по МСК
     
     # Запускаем бота в режиме polling
     await application.initialize()
